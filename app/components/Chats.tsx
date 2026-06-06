@@ -44,7 +44,7 @@ const TextMsg = ({ message }: { message: Message }) => {
         <>
             {message.role === 'assistant' ? (
                 <div>
-<span></span>
+
                 </div>
             ) : (
                 <span
