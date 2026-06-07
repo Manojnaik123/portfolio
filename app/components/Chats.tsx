@@ -44,23 +44,29 @@ const TextMsg = ({ message }: { message: Message }) => {
         <>
             {message.role === 'assistant' ? (
                 <div>
-hello manoj
+                    hello manojlear
+
                 </div>
             ) : (
                 <span
                     className="
                         inline-block
-                        max-w-[85%]
-                        rounded-3xl
-                        rounded-br-sm
+                        max-w-[80%]
+                        rounded-[20px]
+                        rounded-br-[4px]
                         border
-                        border-zinc-200
-                        px-5
-                        py-3
-                        text-[15px]
+                        border-zinc-200/70
+                        px-[18px]
+                        py-[11px]
+                        text-sm
+                        leading-[1.55]
+                        tracking-[-0.01em]
                         text-zinc-900
-                        bg-zinc-400/10
-                    ">
+                        bg-zinc-100/60
+                        font-normal
+                        select-text
+                    "
+                >
                     {message.content}
                 </span>
             )}
