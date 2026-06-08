@@ -36,7 +36,7 @@ const SidebarContent = ({ sidebarOpen, onToggle, onClose, isMobile = false }: Si
     }
 
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-[100dvh] flex flex-col">
 
             {/* Header */}
             <div className={`flex items-center px-3 pt-4 pb-3 ${sidebarOpen ? "justify-between" : "justify-center"}`}>
