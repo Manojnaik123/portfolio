@@ -14,33 +14,28 @@ export type SkillsSubIntent =
   | "skills_devops"
   | "skills_tools"
   | "skills_concepts"
-  | "skills_specific"   // e.g. "tell me about your react experience"
-  | "skills_overview";  // general — render component directly
+  | "skills_specific"
+  | "skills_overview"
+  | "skills_question";
 
 export type ProjectsSubIntent =
-  | "projects_specific"  // e.g. "tell me about skribbbly"
-  | "projects_overview"; // general — render component directly
+  | "projects_specific"
+  | "projects_overview"
+  | "projects_question";
 
 export type EducationSubIntent =
   | "education_overview"
   | "education_timeline"
   | "education_institution"
   | "education_score"
-  | "education_degree";
+  | "education_degree"
+  | "education_question";
 
 export interface ParsedIntent {
   intent: IntentType;
-
-  // set when a deeper AI answer is needed
   hasSubIntent: boolean;
-
   subIntent?: SkillsSubIntent | ProjectsSubIntent | EducationSubIntent;
-
-  // the extracted keyword so the AI knows what to elaborate on
-  // e.g. "react", "skribbbly", "cgpa"
   subjectKeyword?: string;
-
-  // human-readable context to pass straight into your OpenAI prompt
   context?: string;
 }
 
@@ -131,12 +126,43 @@ const CONCEPTS_KEYWORDS = [
 ];
 
 // ─────────────────────────────────────────────────────────────
+// QUESTION KEYWORD BUCKETS
+// ─────────────────────────────────────────────────────────────
+
+const PROJECTS_QUESTION_KEYWORDS = [
+  "hardest", "easiest", "difficult", "challenging", "favourite", "favorite",
+  "best", "worst", "most", "least", "proud", "complex", "simple",
+  "which", "what was", "how was", "tell me about", "explain",
+  "describe", "why", "how did", "what did", "what were",
+  "interesting", "fun", "enjoyed", "liked", "loved", "hated",
+  "took longest", "time", "struggled", "learned", "lesson",
+  "recent", "latest", "biggest", "smallest", "impactful",
+];
+
+const SKILLS_QUESTION_KEYWORDS = [
+  "which", "what", "favourite", "favorite", "best", "most", "least",
+  "strongest", "weakest", "confident", "comfortable", "prefer",
+  "use most", "use the most", "often", "mainly", "primarily",
+  "how good", "how well", "rate", "rating", "level", "proficiency",
+  "how long", "years", "experience with", "tell me about", "explain",
+  "describe", "why", "enjoy", "enjoyed", "like", "liked",
+];
+
+const EDUCATION_QUESTION_KEYWORDS = [
+  "which", "what", "favourite", "favorite", "best", "hardest",
+  "easiest", "enjoyed", "liked", "struggled", "why did", "how was",
+  "tell me", "describe", "explain", "interesting", "fun",
+  "challenging", "difficult", "proud", "how long", "duration",
+];
+
+// ─────────────────────────────────────────────────────────────
 // PROJECT NAME BUCKETS
 // ─────────────────────────────────────────────────────────────
 
 const PROJECT_NAMES = [
   "skribbbly", "finovex", "haqms", "task manager",
   "workflow builder", "portfolio", "ai builder",
+  "dsa visualizer", "bud 101", "openlog", "recruiter radar",
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -170,7 +196,6 @@ function similarity(a: string, b: string): number {
   return 1 - dp[b.length][a.length] / Math.max(a.length, b.length);
 }
 
-// checks if text includes keyword OR any word is fuzzy-close to it
 function matches(text: string, keyword: string): boolean {
   if (text.includes(keyword)) return true;
   return text.split(" ").some((w) => similarity(w, keyword) > 0.82);
@@ -180,7 +205,6 @@ function anyMatch(text: string, keywords: string[]): boolean {
   return keywords.some((kw) => matches(text, kw));
 }
 
-// returns the first keyword from the list that matches
 function firstMatch(text: string, keywords: string[]): string | undefined {
   return keywords.find((kw) => matches(text, kw));
 }
@@ -215,7 +239,6 @@ function detectSkillsSubIntent(text: string): {
   subjectKeyword?: string;
   context?: string;
 } {
-  // specific tech mentioned → send to OpenAI
   if (anyMatch(text, FRONTEND_KEYWORDS)) {
     const keyword = firstMatch(text, FRONTEND_KEYWORDS)!;
     return {
@@ -276,7 +299,17 @@ function detectSkillsSubIntent(text: string): {
     };
   }
 
-  // "what skills do you have" — render component directly
+  // question about skills without a specific tech mentioned
+  if (anyMatch(text, SKILLS_QUESTION_KEYWORDS)) {
+    const keyword = firstMatch(text, SKILLS_QUESTION_KEYWORDS);
+    return {
+      subIntent: "skills_question",
+      hasSubIntent: true,
+      subjectKeyword: keyword,
+      context: `User is asking a question about Manoj's skills: "${text}". Answer based on his full skill set — React, Next.js, TypeScript, Node.js, Express, PostgreSQL, Supabase, Prisma, Redis, Socket.io, Docker, and more. Be specific and personal in tone.`,
+    };
+  }
+
   return {
     subIntent: "skills_overview",
     hasSubIntent: false,
@@ -293,8 +326,8 @@ function detectProjectsSubIntent(text: string): {
   subjectKeyword?: string;
   context?: string;
 } {
+  // specific project name mentioned
   const projectName = firstMatch(text, PROJECT_NAMES);
-
   if (projectName) {
     return {
       subIntent: "projects_specific",
@@ -304,7 +337,18 @@ function detectProjectsSubIntent(text: string): {
     };
   }
 
-  // "tell me about your projects" — render component directly
+  // question/comparison about projects — needs AI answer
+  if (anyMatch(text, PROJECTS_QUESTION_KEYWORDS)) {
+    const keyword = firstMatch(text, PROJECTS_QUESTION_KEYWORDS);
+    return {
+      subIntent: "projects_question",
+      hasSubIntent: true,
+      subjectKeyword: keyword,
+      context: `User is asking a question about Manoj's projects: "${text}". Answer based on his projects — DSA Visualizer, Bud 101, OpenLog, Recruiter Radar, Skribbbly, HAQMS, Task Manager API. Be specific and personal in tone.`,
+    };
+  }
+
+  // "show me your projects" — render component directly
   return {
     subIntent: "projects_overview",
     hasSubIntent: false,
@@ -370,6 +414,17 @@ function detectEducationSubIntent(text: string): {
     };
   }
 
+  // question about education without a specific category
+  if (anyMatch(text, EDUCATION_QUESTION_KEYWORDS)) {
+    const keyword = firstMatch(text, EDUCATION_QUESTION_KEYWORDS);
+    return {
+      subIntent: "education_question",
+      hasSubIntent: true,
+      subjectKeyword: keyword,
+      context: `User is asking a question about Manoj's education: "${text}". Answer based on his background — BSc IT from University of Mumbai, MCA final year at Sikkim Manipal University. Be specific and personal in tone.`,
+    };
+  }
+
   return {
     subIntent: "education_overview",
     hasSubIntent: false,
@@ -399,7 +454,6 @@ export function classifyUserInput(input: string): ParsedIntent {
     return { intent, ...result };
   }
 
-  // blogs — always render component, no sub-intents needed
   if (intent === "blogs") {
     return { intent, hasSubIntent: false };
   }

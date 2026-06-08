@@ -12,6 +12,8 @@ export default function Home() {
     message,
     setMessage,
     sendUserMessage,
+    editMessageId,
+    saveEditedMessage,
   } = useConversation();
 
   return (
@@ -130,7 +132,12 @@ export default function Home() {
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendUserMessage();
+
+                if (editMessageId) {
+                  saveEditedMessage();
+                } else {
+                  sendUserMessage();
+                }
               }
             }}
             placeholder="Ask anything about Manoj..."
@@ -146,7 +153,13 @@ export default function Home() {
               ↵ enter to send · shift+enter for new line
             </span>
             <button
-              onClick={() => sendUserMessage()}
+              onClick={() => {
+                if (editMessageId) {
+                  saveEditedMessage();
+                } else {
+                  sendUserMessage();
+                }
+              }}
               disabled={!message.trim()}
               className="bg-[#ffac81] disabled:opacity-40 disabled:cursor-not-allowed
                    p-2 rounded-full text-white transition-all duration-150

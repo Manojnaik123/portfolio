@@ -13,6 +13,8 @@ export type Message = {
     role: Role;
     type: "projects" | "skills" | "education" | "text" | "loading";
     content: string | ReactNode;
+
+    feedback?: 'like' | 'dislike' | null;
 }
 
 export type Conversation = {
@@ -31,6 +33,15 @@ type ConversationContextType = {
     sendUserMessage: (msg?: string) => Promise<void>;
     switchConversation: (id: string) => void;
     startNewConversation: () => void;
+
+    editMessageId: string | null;
+    startEditingMessage: (messageId: string, content: string) => void;
+    saveEditedMessage: () => Promise<void>;
+
+    setFeedback: (
+        messageId: string,
+        feedback: "like" | "dislike"
+    ) => void;
 }
 
 const ConversationContext = createContext<ConversationContextType | null>(null);
@@ -58,6 +69,162 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
     const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
     const [noChatsYet, setNoChatsYet] = useState(true);
     const [message, setMessage] = useState("");
+    const [editMessageId, setEditMessageId] = useState<string | null>(null);
+
+    function setFeedback(
+        messageId: string,
+        feedback: "like" | "dislike"
+    ) {
+        if (!activeConvoId) return;
+
+        setConversations(prev =>
+            prev.map(convo => {
+                if (convo.id !== activeConvoId) {
+                    return convo;
+                }
+
+                return {
+                    ...convo,
+                    messages: convo.messages.map(msg =>
+                        msg.id === messageId
+                            ? {
+                                ...msg,
+                                feedback,
+                            }
+                            : msg
+                    ),
+                };
+            })
+        );
+    }
+
+    function startEditingMessage(
+        messageId: string,
+        content: string
+    ) {
+        setEditMessageId(messageId);
+        setMessage(content);
+    }
+
+    async function saveEditedMessage() {
+        if (!editMessageId || !activeConvoId) return;
+
+        const convo = conversations.find(
+            c => c.id === activeConvoId
+        );
+
+        if (!convo) return;
+
+        const editedIndex = convo.messages.findIndex(
+            m => m.id === editMessageId
+        );
+
+        if (editedIndex === -1) return;
+
+        const updatedMessages = convo.messages.slice(
+            0,
+            editedIndex + 1
+        );
+
+        updatedMessages[editedIndex] = {
+            ...updatedMessages[editedIndex],
+            content: message,
+        };
+
+        setConversations(prev =>
+            prev.map(c =>
+                c.id === activeConvoId
+                    ? {
+                        ...c,
+                        messages: updatedMessages,
+                    }
+                    : c
+            )
+        );
+
+        const editedContent = message;
+
+        setMessage("");
+        setEditMessageId(null);
+
+        const loadingId = crypto.randomUUID();
+
+        setConversations(prev =>
+            prev.map(c => {
+                if (c.id !== activeConvoId) return c;
+
+                return {
+                    ...c,
+                    messages: [
+                        ...updatedMessages,
+                        {
+                            id: loadingId,
+                            role: "assistant",
+                            type: "loading",
+                            content: "Thinking...",
+                        },
+                    ],
+                };
+            })
+        );
+
+        const result = classifyUserInput(editedContent);
+
+        if (
+            result.intent !== "unknown" &&
+            !result.hasSubIntent
+        ) {
+            replaceLoading(
+                activeConvoId,
+                loadingId,
+                {
+                    id: crypto.randomUUID(),
+                    role: "assistant",
+                    type: result.intent as
+                        | "projects"
+                        | "skills"
+                        | "education",
+                    content: getComponentForIntent(
+                        result.intent
+                    ),
+                }
+            );
+
+            return;
+        }
+
+        try {
+            const data = await askClaude(
+                editedContent,
+                activeConvoId
+            );
+
+            replaceLoading(
+                activeConvoId,
+                loadingId,
+                {
+                    id: crypto.randomUUID(),
+                    role: "assistant",
+                    type: "text",
+                    content:
+                        data?.response ??
+                        "Sorry, I couldn't find an answer.",
+                }
+            );
+        } catch {
+            replaceLoading(
+                activeConvoId,
+                loadingId,
+                {
+                    id: crypto.randomUUID(),
+                    role: "assistant",
+                    type: "text",
+                    content:
+                        "Sorry, something went wrong.",
+                }
+            );
+        }
+    }
 
     function switchConversation(id: string) {
         setActiveConvoId(id);
@@ -169,7 +336,8 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
             const data = await askClaude(
                 result.hasSubIntent && result.context
                     ? result.context
-                    : content
+                    : content,
+                capturedConvoId
             );
 
             replaceLoading(capturedConvoId, loadingId, {
@@ -190,13 +358,23 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    async function askClaude(content: string) {
-        return 'hi';
+    async function askClaude(content: string, convoId: string) {
+        const convo = conversations.find(c => c.id === convoId);
+        return;
+        const history = (convo?.messages ?? [])
+            .filter(m => m.type === "text" && m.type !== "text")
+            .map(m => ({
+                role: m.role,
+                content: m.content as string,
+            }));
+
         const res = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                messages: [{ role: "user", content }],
+                messages: [
+                    ...history,
+                    { role: "user", content }],
             }),
         });
         return await res.json();
@@ -210,6 +388,13 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
             message,
             setMessage,
             sendUserMessage,
+
+            editMessageId,
+            startEditingMessage,
+            saveEditedMessage,
+
+            setFeedback,
+
             switchConversation,
             startNewConversation,
         }}>

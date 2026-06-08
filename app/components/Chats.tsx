@@ -7,7 +7,8 @@ import ChatEducation from './ChatEducation';
 import { Copy, Pen } from 'lucide-react';
 import ChatLoadingAnimation from './ChatloadingAnimation';
 import ReactMarkdown from "react-markdown";
-import { Message } from '@/context/ConversationContext';
+import { Message, useConversation } from '@/context/ConversationContext';
+import ResponseFooter from './ResponseFooter';
 
 const Chats = ({ messages }: { messages: Message[] }) => {
     const lastScrolledUserMessage = useRef<string | null>(null);
@@ -39,22 +40,21 @@ const Chats = ({ messages }: { messages: Message[] }) => {
                 <div
                     key={msg.id}
                     id={`message-${msg.id}`}
-                    className={`flex ${
-                        msg.role === "user"
-                            ? "justify-end"
-                            : "justify-start"
-                    }`}
+                    className={`flex ${msg.role === "user"
+                        ? "justify-end"
+                        : "justify-start"
+                        }`}
                 >
                     {(() => {
                         switch (msg.type) {
                             case "text":
                                 return <TextMsg message={msg} />
                             case "projects":
-                                return <ChatProjects />;
+                                return <ChatProjects messageId={msg.id} feedback={msg.feedback}/>;
                             case "skills":
-                                return <ChatSkills />;
+                                return <ChatSkills messageId={msg.id} feedback={msg.feedback}/>;
                             case "education":
-                                return <ChatEducation />;
+                                return <ChatEducation messageId={msg.id} feedback={msg.feedback}/>;
                             case "loading":
                                 return <ChatLoadingAnimation />;
                             default:
@@ -68,6 +68,8 @@ const Chats = ({ messages }: { messages: Message[] }) => {
 };
 
 const TextMsg = ({ message }: { message: Message }) => {
+    const { startEditingMessage, setFeedback } = useConversation()
+
     return (
         <>
             {message.role === "assistant" ? (
@@ -133,6 +135,7 @@ const TextMsg = ({ message }: { message: Message }) => {
                     >
                         {message.content as string}
                     </ReactMarkdown>
+                    <ResponseFooter messageId={message.id} feedback={message.feedback}/>
                 </div>
             ) : (
                 <div className='w-full flex items-end flex-col group mt-6'>
@@ -197,7 +200,12 @@ const TextMsg = ({ message }: { message: Message }) => {
                                 transition-colors
                             "
                             aria-label="Edit message"
-                        >
+                            onClick={() =>
+                                startEditingMessage(
+                                    message.id,
+                                    message.content as string
+                                )
+                            }>
                             <Pen size={12} />
                         </button>
                     </div>

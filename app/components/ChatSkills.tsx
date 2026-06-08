@@ -35,7 +35,12 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
   </div>
 );
 
-export default function Skills() {
+type Props = {
+  messageId: string;
+  feedback?: "like" | "dislike" | null;
+};
+
+export default function Skills({ messageId, feedback } : Props) {
   return (
     <div className="w-full">
 
@@ -131,7 +136,7 @@ export default function Skills() {
         <DownLoadResumeButton />
       </div>
 
-      <ResponseFooter />
+      <ResponseFooter messageId={messageId} feedback={feedback} />
     </div>
   );
 }
