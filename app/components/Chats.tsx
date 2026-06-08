@@ -5,6 +5,7 @@ import ChatSkills from './ChatSkills';
 import ChatEducation from './ChatEducation';
 import { Copy, Edit, Pen } from 'lucide-react';
 import ChatLoadingAnimation from './ChatloadingAnimation';
+import ReactMarkdown from "react-markdown";
 
 const Chats = ({ messages }: { messages: Message[] }) => {
 
@@ -24,15 +25,12 @@ const Chats = ({ messages }: { messages: Message[] }) => {
                                 return <TextMsg message={msg} />
                             case "projects":
                                 return <ChatProjects />;
-
                             case "skills":
                                 return <ChatSkills />
-
                             case "education":
                                 return <ChatEducation />
                             case "loading":
-                                return <ChatLoadingAnimation/>
-
+                                return <ChatLoadingAnimation />
                             default:
                                 return null;
                         }
@@ -46,9 +44,69 @@ const Chats = ({ messages }: { messages: Message[] }) => {
 const TextMsg = ({ message }: { message: Message }) => {
     return (
         <>
-            {message.role === 'assistant' ? (
-                <div>
-                    hello manojlear
+            {message.role === "assistant" ? (
+                <div className="w-full py-2">
+                    <ReactMarkdown
+                        components={{
+                            h1: ({ children }) => (
+                                <h1 className="text-[16px] font-semibold text-[#1a1a1a] mb-2">
+                                    {children}
+                                </h1>
+                            ),
+
+                            h2: ({ children }) => (
+                                <h2 className="text-[15px] font-medium text-[#1a1a1a] mb-2 mt-4">
+                                    {children}
+                                </h2>
+                            ),
+
+                            p: ({ children }) => (
+                                <p className="text-[12px] text-[#585858] leading-relaxed mb-3">
+                                    {children}
+                                </p>
+                            ),
+
+                            strong: ({ children }) => (
+                                <span className="font-medium text-[#1a1a1a]">
+                                    {children}
+                                </span>
+                            ),
+
+                            em: ({ children }) => (
+                                <span className="italic">
+                                    {children}
+                                </span>
+                            ),
+
+                            ul: ({ children }) => (
+                                <ul className="list-disc pl-5 space-y-1 mb-3 text-[12px] text-[#585858]">
+                                    {children}
+                                </ul>
+                            ),
+
+                            ol: ({ children }) => (
+                                <ol className="list-decimal pl-5 space-y-1 mb-3 text-[12px] text-[#585858]">
+                                    {children}
+                                </ol>
+                            ),
+
+                            li: ({ children }) => (
+                                <li className="leading-relaxed">
+                                    {children}
+                                </li>
+                            ),
+
+                            blockquote: ({ children }) => (
+                                <div className="border-l-2 border-[#e9ecef] pl-3 my-3">
+                                    <p className="text-[12px] text-[#585858] leading-relaxed">
+                                        {children}
+                                    </p>
+                                </div>
+                            ),
+                        }}
+                    >
+                        {message.content as string}
+                    </ReactMarkdown>
                 </div>
             ) : (
                 <div className='w-full flex items-end flex-col group mt-6'>
@@ -123,7 +181,7 @@ const TextMsg = ({ message }: { message: Message }) => {
                 </div>
             )}
         </>
-    )
-}
+    );
+};
 
 export default Chats

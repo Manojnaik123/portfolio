@@ -1,10 +1,19 @@
 'use client'
 
+import { useConversation } from '@/context/ConversationContext';
+import { truncateText } from '@/utils/textFormatingHelper';
 import { Brain, ChevronDown, CirclePlus, Dock, FolderKanban, PanelLeft, School, Wrench } from 'lucide-react';
 import { useState } from 'react'
 
 const SideBar = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const { conversations, startNewConversation, sendUserMessage } = useConversation();
+
+    function typeSelected(text: string) {
+        sendUserMessage(text)
+    }
+
 
     return (
         <div className={`${sidebarOpen ? 'w-72' : 'w-16'} hidden md:flex p-2 bg-white h-screen transition-all duration-200 ease-in-out overflow-hidden`}>
@@ -28,25 +37,29 @@ const SideBar = () => {
                     <ul className='flex-1 flex flex-col gap-0.5 px-1 mt-1'>
                         <li className={`flex gap-2.5 items-center px-3 py-2.5 rounded-xl
                                        hover:bg-white text-[13px] text-[#585858] cursor-pointer
-                                       transition-colors ${!sidebarOpen && 'justify-center'}`}>
+                                       transition-colors ${!sidebarOpen && 'justify-center'}`}
+                            onClick={() => startNewConversation()}>
                             <CirclePlus size={15} className='shrink-0' />
                             {sidebarOpen && 'New Chat'}
                         </li>
                         <li className={`flex gap-2.5 items-center px-3 py-2.5 rounded-xl
                                        hover:bg-white text-[13px] text-[#585858] cursor-pointer
-                                       transition-colors ${!sidebarOpen && 'justify-center'}`}>
+                                       transition-colors ${!sidebarOpen && 'justify-center'}`} 
+                                       onClick={() => typeSelected('projects')}>
                             <FolderKanban size={15} className='shrink-0' />
                             {sidebarOpen && 'Projects'}
                         </li>
                         <li className={`flex gap-2.5 items-center px-3 py-2.5 rounded-xl
                                        hover:bg-white text-[13px] text-[#585858] cursor-pointer
-                                       transition-colors ${!sidebarOpen && 'justify-center'}`}>
+                                       transition-colors ${!sidebarOpen && 'justify-center'}`}
+                                       onClick={() => typeSelected('skills')}>
                             <Wrench size={15} className='shrink-0' />
                             {sidebarOpen && 'Skills'}
                         </li>
                         <li className={`flex gap-2.5 items-center px-3 py-2.5 rounded-xl
                                        hover:bg-white text-[13px] text-[#585858] cursor-pointer
-                                       transition-colors ${!sidebarOpen && 'justify-center'}`}>
+                                       transition-colors ${!sidebarOpen && 'justify-center'}`}
+                                       onClick={() => typeSelected('education')}>
                             <School size={15} className='shrink-0' />
                             {sidebarOpen && 'Education'}
                         </li>
@@ -56,11 +69,15 @@ const SideBar = () => {
                             <Dock size={15} className='shrink-0' />
                             {sidebarOpen && 'Blogs'}
                         </li>
-                        <li className={`flex gap-2.5 items-center px-3 py-2.5 rounded-xl
+                        <li className={`flex flex-col gap-2.5 justify-center px-3 py-2.5 rounded-xl
                                        hover:bg-white text-[13px] text-[#585858] cursor-pointer
                                        transition-colors ${!sidebarOpen && 'justify-center'}`}>
-                            <ChevronDown size={15} className='shrink-0' />
-                            {sidebarOpen && 'Recent chats'}
+                            <span className='flex items-center gap-2' > <ChevronDown size={15} className='shrink-0' /> {sidebarOpen && 'Recent chats'}</span>
+                            <ul className='pl-4 text-[12px]'>
+                                {conversations.map(c => (
+                                    <li>{truncateText(c.title, 20)}</li>
+                                ))}
+                            </ul>
                         </li>
                     </ul>
 

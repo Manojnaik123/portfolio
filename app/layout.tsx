@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import SideBar from "./components/SideBar";
 import TopNavBar from "./components/TopNavBar";
+import { ConversationProvider } from "@/context/ConversationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,11 +42,13 @@ export default function RootLayout({
         `}
     >
       <body className="min-h-full flex flex-col md:flex-row">
-        <TopNavBar />
-        <SideBar />
-        <main className="flex-1 flex justify-center">
-          {children}
-        </main>
+        <ConversationProvider>
+          <TopNavBar />
+          <SideBar />
+          <main className="flex-1 flex justify-center">
+            {children}
+          </main>
+        </ConversationProvider>
       </body>
     </html>
   );
