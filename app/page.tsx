@@ -15,16 +15,18 @@ export default function Home() {
   } = useConversation();
 
   return (
-    <div className="p-4 pt-16 md:pt-0 md:p-0 max-w-3xl w-full h-screen flex flex-col">
+    <div className="relative p-4 pt-16 md:pt-0 md:p-0 max-w-3xl w-full h-screen flex flex-col">
       <div className="w-full flex-1 chat-scroll overflow-y-auto md:px-6">
         {noChatsYet && (
-          <div className="w-full flex justify-center items-start h-full overflow-y-auto py-6 px-4">
-            <div className="flex flex-col text-center items-center w-full max-w-md">
+          <div className="w-full flex justify-center items-center h-full px-4 pb-20">
+            <div className="flex flex-col items-center w-full max-w-sm">
 
+              {/* Cloud icon */}
               <div className='p-3 rounded-2xl bg-[#fff0eb] border border-[#ffe0d0] mb-3'>
                 <Cloud size={22} className='text-[#ffac81]' />
               </div>
 
+              {/* Time + location */}
               <div className='flex items-center gap-1.5 mb-4'>
                 <span className='text-[12px] font-medium text-[#1a1a1a]'>
                   6:21<sup className='text-[9px] font-normal'>PM</sup>
@@ -37,50 +39,89 @@ export default function Home() {
                 </svg>
               </div>
 
-              <h1 className='text-[17px] font-semibold text-[#1a1a1a] leading-snug mb-1'>
+              {/* Heading */}
+              <h1 className='text-[16px] font-semibold text-[#1a1a1a] leading-snug mb-1 text-center'>
                 What would you like to know about Manoj?
               </h1>
-              <p className='text-[12px] text-[#9b9b9b] leading-relaxed mb-6'>
-                Type a question below or pick a suggested topic to get started.
+              <p className='text-[12px] text-[#9b9b9b] leading-relaxed mb-8 text-center'>
+                Ask me anything — his work, skills, or background.
               </p>
 
-              <div className='bg-[#f8f9fa] rounded-2xl w-full p-1.5 border border-[#e9ecef]'>
-                <span className='text-[11px] text-[#9b9b9b] px-2 pt-1 pb-2 block text-left'>
-                  Top Suggestions
+              {/* Suggestions */}
+              <div className='w-full flex flex-col gap-1.5'>
+                <span className='text-[10px] font-medium uppercase tracking-widest text-[#9b9b9b] mb-1'>
+                  Suggested
                 </span>
-                <ul className='bg-white rounded-xl border border-[#e9ecef] overflow-hidden'>
-                  {[
-                    { emoji: "⚡", text: "Tell me about Manoj's technical background." },
-                    { emoji: "📂", text: "What projects has he built recently?" },
-                    { emoji: "📄", text: "Can I see or download a copy of his resume?" },
-                    { emoji: "🧠", text: "How is his expertise in Data Structures and Algorithms (DSA)?" },
-                  ].map((item, i, arr) => (
-                    <li
-                      key={item.text}
-                      onClick={() => sendUserMessage(item.text)}
-                      className={`w-full flex justify-between items-center px-3 py-2.5 gap-2
-                        hover:bg-[#f8f9fa] text-[13px] text-[#1a1a1a] cursor-pointer
-                        ${i < arr.length - 1 ? 'border-b border-[#f0f0f0]' : ''}`}
-                    >
-                      <span className='flex items-center gap-2.5'>
-                        <span>{item.emoji}</span> {item.text}
-                      </span>
-                      <ChevronRight size={13} className='text-[#9b9b9b] shrink-0' />
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
+                <button
+                  onClick={() => sendUserMessage("Tell me about Manoj's technical background.")}
+                  className='w-full flex items-center justify-between px-4 py-3 rounded-xl
+                   bg-white border border-[#efefef] hover:border-[#e0e0e0]
+                   hover:shadow-[0_1px_4px_rgba(0,0,0,0.06)]
+                   text-[12px] text-[#1a1a1a] text-left transition-all group'
+                >
+                  <span className='flex items-center gap-3'>
+                    <span className='text-[15px]'>⚡</span>
+                    Tell me about Manoj's technical background.
+                  </span>
+                  <ChevronRight size={13} className='text-[#ccc] group-hover:text-[#9b9b9b] shrink-0 transition-colors' />
+                </button>
+
+                <button
+                  onClick={() => sendUserMessage("What projects has he built recently?")}
+                  className='w-full flex items-center justify-between px-4 py-3 rounded-xl
+                   bg-white border border-[#efefef] hover:border-[#e0e0e0]
+                   hover:shadow-[0_1px_4px_rgba(0,0,0,0.06)]
+                   text-[12px] text-[#1a1a1a] text-left transition-all group'
+                >
+                  <span className='flex items-center gap-3'>
+                    <span className='text-[15px]'>📂</span>
+                    What projects has he built recently?
+                  </span>
+                  <ChevronRight size={13} className='text-[#ccc] group-hover:text-[#9b9b9b] shrink-0 transition-colors' />
+                </button>
+
+                <button
+                  onClick={() => sendUserMessage("Can I see or download a copy of his resume?")}
+                  className='w-full flex items-center justify-between px-4 py-3 rounded-xl
+                   bg-white border border-[#efefef] hover:border-[#e0e0e0]
+                   hover:shadow-[0_1px_4px_rgba(0,0,0,0.06)]
+                   text-[12px] text-[#1a1a1a] text-left transition-all group'
+                >
+                  <span className='flex items-center gap-3'>
+                    <span className='text-[15px]'>📄</span>
+                    Can I see or download a copy of his resume?
+                  </span>
+                  <ChevronRight size={13} className='text-[#ccc] group-hover:text-[#9b9b9b] shrink-0 transition-colors' />
+                </button>
+
+                <button
+                  onClick={() => sendUserMessage("How is his expertise in Data Structures and Algorithms (DSA)?")}
+                  className='w-full flex items-center justify-between px-4 py-3 rounded-xl
+                   bg-white border border-[#efefef] hover:border-[#e0e0e0]
+                   hover:shadow-[0_1px_4px_rgba(0,0,0,0.06)]
+                   text-[12px] text-[#1a1a1a] text-left transition-all group'
+                >
+                  <span className='flex items-center gap-3'>
+                    <span className='text-[15px]'>🧠</span>
+                    How is his expertise in DSA?
+                  </span>
+                  <ChevronRight size={13} className='text-[#ccc] group-hover:text-[#9b9b9b] shrink-0 transition-colors' />
+                </button>
+
+              </div>
             </div>
           </div>
         )}
 
         {!noChatsYet && (
-          <Chats messages={conversations.find(c => c.id === activeConvoId)?.messages ?? []} />
+          <div className="pb-32">
+            <Chats messages={conversations.find(c => c.id === activeConvoId)?.messages ?? []} />
+          </div>
         )}
       </div>
 
-      <div className="w-full md:px-2">
+      <div className="absolute bottom-0 left-0 right-0 md:px-2 bg-white rounded-t-full">
         <div className="rounded-3xl flex flex-col border border-[#e9ecef] bg-white
                   shadow-[0_1px_4px_rgba(0,0,0,0.06)] p-[2px]">
           <textarea

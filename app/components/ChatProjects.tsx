@@ -284,3 +284,4 @@ const ChatProjects = () => (
 export default ChatProjects;
 export { PROJECTS };
 export type { Project };
+
