@@ -153,6 +153,8 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
         setNoChatsYet(false);
 
         if (result.intent !== "unknown" && !result.hasSubIntent) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
             replaceLoading(capturedConvoId, loadingId, {
                 id: crypto.randomUUID(),
                 role: "assistant",

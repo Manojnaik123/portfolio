@@ -14,9 +14,6 @@ export default function Home() {
     sendUserMessage,
   } = useConversation();
 
-  console.log(conversations);
-  
-
   return (
     <div className="p-4 pt-16 md:pt-0 md:p-0 max-w-3xl w-full h-screen flex flex-col">
       <div className="w-full flex-1 chat-scroll overflow-y-auto md:px-4">

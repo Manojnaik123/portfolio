@@ -100,7 +100,7 @@ const SideBar = () => {
                             <span className='flex items-center gap-2' > <ChevronDown size={15} className='shrink-0' /> {sidebarOpen && 'Recent chats'}</span>
                             <ul className='pl-4 text-[12px]'>
                                 {conversations.map(c => (
-                                    <li>{truncateText(c.title, 20)}</li>
+                                    <li key={c.id} >{truncateText(c.title, 20)}</li>
                                 ))}
                             </ul>
                         </li>
