@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div className="p-4 pt-16 md:pt-0 md:p-0 max-w-3xl w-full h-screen flex flex-col">
-      <div className="w-full flex-1 chat-scroll overflow-y-auto md:px-4">
+      <div className="w-full flex-1 chat-scroll overflow-y-auto md:px-6">
         {noChatsYet && (
           <div className="w-full flex justify-center items-start h-full overflow-y-auto py-6 px-4">
             <div className="flex flex-col text-center items-center w-full max-w-md">
@@ -80,7 +80,7 @@ export default function Home() {
         )}
       </div>
 
-      <div className="w-full">
+      <div className="w-full px-2">
         <div className="rounded-3xl flex flex-col border border-[#e9ecef] bg-white
                   shadow-[0_1px_4px_rgba(0,0,0,0.06)] p-[2px]">
           <textarea
