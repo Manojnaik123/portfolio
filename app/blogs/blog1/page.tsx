@@ -74,20 +74,20 @@ const BlogPage = () => {
                         <div className="bg-[#0f172a] text-[#e5e7eb] rounded-xl p-4 text-[12px] overflow-x-auto">
 
                             <pre>{`function getComponentForIntent(intent) {
-  switch (intent) {
-    case "projects":
-      return <ChatProjects />;
+                            switch (intent) {
+                                case "projects":
+                                return <ChatProjects />;
 
-    case "skills":
-      return <ChatSkills />;
+                                case "skills":
+                                return <ChatSkills />;
 
-    case "education":
-      return <ChatEducation />;
+                                case "education":
+                                return <ChatEducation />;
 
-    default:
-      return null;
-  }
-}`}</pre>
+                                default:
+                                return null;
+                            }
+                            }`}</pre>
 
                         </div>
 

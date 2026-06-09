@@ -221,7 +221,7 @@ const SidebarContent = ({ sidebarOpen, onToggle, onClose, isMobile = false }: Si
             {!sidebarOpen && <div className="flex-1" />}
 
             {/* Theme toggle */}
-            <div className={`px-2 mb-2 ${!sidebarOpen && "flex justify-center"}`}>
+            {/* <div className={`px-2 mb-2 ${!sidebarOpen && "flex justify-center"}`}>
                 <button
                     onClick={toggleTheme}
                     className={`flex items-center gap-2 text-[12px] font-medium rounded-lg transition-colors
@@ -242,7 +242,7 @@ const SidebarContent = ({ sidebarOpen, onToggle, onClose, isMobile = false }: Si
                     }
                     {sidebarOpen && (isDark ? "Light mode" : "Dark mode")}
                 </button>
-            </div>
+            </div> */}
 
             {/* AskManoj card */}
             {sidebarOpen && (

@@ -5,6 +5,7 @@ import SideBar from "./components/SideBar";
 import TopNavBar from "./components/TopNavBar";
 import { ConversationProvider } from "@/context/ConversationContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import ThemeToggle from "./components/ThemeToggole";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default function RootLayout({
         style={{ backgroundColor: "var(--color-bg-page)", color: "var(--color-text-primary)" }}
       >
         <ThemeProvider>
+          <ThemeToggle/>
           <ConversationProvider>
             <TopNavBar />
             <SideBar />
