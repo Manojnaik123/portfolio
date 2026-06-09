@@ -16,6 +16,13 @@ import ChatResume from './ChatResume';
 const Chats = ({ messages }: { messages: Message[] }) => {
     const lastScrolledUserMessage = useRef<string | null>(null);
 
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     useEffect(() => {
         const latestUserMessage = [...messages]
             .reverse()
@@ -93,6 +100,7 @@ const Chats = ({ messages }: { messages: Message[] }) => {
                     })()}
                 </div>
             ))}
+            <div ref={bottomRef}/>
         </div>
     );
 };
